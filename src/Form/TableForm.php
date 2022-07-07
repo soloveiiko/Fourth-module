@@ -184,4 +184,33 @@ class TableForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
   }
 
+  /**
+   * Function adding a new row.
+   */
+  public function addRows(array $form, FormStateInterface $form_state): array {
+    // Increase by 1 the number of rows.
+    $this->rowCount++;
+    // Rebuild form with 1 extra row.
+    $form_state->setRebuild();
+    return $form;
+  }
+
+  /**
+   * Function adding a new table.
+   */
+  public function addTable(array $form, FormStateInterface $form_state): array {
+    // Increase by 1 the number of tables.
+    $this->tableCount++;
+    // Create new tables.
+    $form_state->setRebuild();
+    return $form;
+  }
+
+  /**
+   * Refreshing the page.
+   */
+  public function submitAjaxForm(array $form, FormStateInterface $form_state): array {
+    return $form;
+  }
+
 }
