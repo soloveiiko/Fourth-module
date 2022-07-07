@@ -1,0 +1,7 @@
+bonnie.content:
+  path: '/bonnie'
+  defaults:
+    _form: '\Drupal\bonnie\Form\TableForm'
+    _title: 'Table'
+  requirements:
+    _permission: 'access content'
