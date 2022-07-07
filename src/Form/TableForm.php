@@ -144,7 +144,7 @@ class TableForm extends FormBase {
       $form[$table_id] = [
         '#type' => 'table',
         '#header' => $this->header,
-        '#caption' => $this->t('№@number', ['@number' => $t]),
+        '#caption' => $this->t('Table №@number', ['@number' => $t]),
       ];
       $this->buildRow($table_id, $form[$table_id], $form_state);
     }
@@ -235,8 +235,42 @@ class TableForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $form_state->setRebuild();
+    for ($t = 0; $t <= $this->tableCount; $t++) {
+      for ($r = 1; $r <= $this->rowCount; $r++) {
+        // Value setting.
+        $value = $form_state->getValue(['tableCount-' . $t, $r]);
+        // Default value for inactive cells.
+        $q1 = 0;
+        $q2 = 0;
+        $q3 = 0;
+        $q4 = 0;
+        $ytd = 0;
+        // Validation for inactive cells.
+        if (!empty($value['jan']) || !empty($value['feb']) || !empty($value['mar'])) {
+          $q1 = round(($value['jan'] + $value['feb'] + $value['mar'] + 1) / 3, 2);
+        }
+        if (!empty($value['apr']) || !empty($value['may']) || !empty($value['jun'])) {
+          $q2 = round((($value['apr'] + $value['may'] + $value['jun']) + 1) / 3, 2);
+        }
+        if (!empty($value['jul']) || !empty($value['aug']) || !empty($value['sep'])) {
+          $q3 = round((($value['jul'] + $value['aug'] + $value['sep']) + 1) / 3, 2);
+        }
+        if (!empty($value['oct']) || !empty($value['nov']) || !empty($value['dec'])) {
+          $q4 = round((($value['oct'] + $value['nov'] + $value['dec']) + 1) / 3, 2);
+        }
+        if ($q1 !== 0 || $q2 !== 0 || $q3 !== 0 || $q4 !== 0) {
+          $ytd = round((($q1 + $q2 + $q3 + $q4) + 1) / 4, 2);
+        }
+        // Set values for inactive cells.
+        $form['tableCount-' . $t][$r]['q1']['#value'] = $q1;
+        $form['tableCount-' . $t][$r]['q2']['#value'] = $q2;
+        $form['tableCount-' . $t][$r]['q3']['#value'] = $q3;
+        $form['tableCount-' . $t][$r]['q4']['#value'] = $q4;
+        $form['tableCount-' . $t][$r]['ytd']['#value'] = $ytd;
+      }
+    }
     $this->messenger()->addStatus('Valid.');
+
   }
 
   /**
