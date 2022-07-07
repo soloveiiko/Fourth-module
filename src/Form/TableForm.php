@@ -176,12 +176,67 @@ class TableForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+    $this->inactiveCells();
+    // Start and end points.
+    $start = NULL;
+    $end = NULL;
+    // Storing values from each table.
+    $values = [];
+    // Storing all the table with cell values.
+    $active_val = [];
+    for ($t = 1; $t <= $this->tableCount; $t++) {
+      $tables = $form_state->getValue('tableCount-' . $t);
+      foreach ($tables as $row_id) {
+        foreach ($row_id as $cell_id => $cells) {
+          if (!array_key_exists($cell_id, $this->inactiveCells)) {
+            $active_val['tableCount-' . $t][] = $cells;
+          }
+        }
+      }
+      // Saving values.
+      foreach ($active_val as $cells_val) {
+        $values = $cells_val;
+      }
+      // Validation different tables.
+      foreach ($values as $id => $value) {
+        for ($f = 0; $f < count($values); $f++) {
+          if (empty($active_val['tableCount-1'][$f]) !== empty($active_val['tableCount-' . $t][$f])) {
+            $form_state->setErrorByName('tableCount-' . $t, 'Tables are different.');
+          }
+        }
+        // Validation of start point.
+        if (!empty($value) || $value == '0') {
+          $start = $id;
+          break;
+        }
+      }
+      // Start point is not empty.
+      if ($start !== NULL) {
+        for ($f = $start; $f < count($values); $f++) {
+          if (($values[$f] == NULL)) {
+            $end = $f;
+            break;
+          }
+        }
+      }
+      // End point is not empty.
+      if ($end !== NULL) {
+        for ($c = $end; $c < count($values); $c++) {
+          if (($values[$c]) != NULL) {
+            $form_state->setErrorByName('tableCount-', $this->t('Invalid.'));
+          }
+        }
+      }
+    }
+
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $form_state->setRebuild();
+    $this->messenger()->addStatus('Valid.');
   }
 
   /**
