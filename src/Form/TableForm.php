@@ -140,7 +140,7 @@ class TableForm extends FormBase {
   public function buildTable(int $tableCount, array &$form, FormStateInterface $form_state) {
     $this->addHeader();
     for ($t = 1; $t <= $tableCount; $t++) {
-      $table_id = 'tableCount-' . $t;
+      $table_id = "tableCount-{$t}";
       $form[$table_id] = [
         '#type' => 'table',
         '#header' => $this->header,
@@ -185,11 +185,11 @@ class TableForm extends FormBase {
     // Storing all the table with cell values.
     $active_val = [];
     for ($t = 1; $t <= $this->tableCount; $t++) {
-      $tables = $form_state->getValue('tableCount-' . $t);
+      $tables = $form_state->getValue("tableCount-{$t}");
       foreach ($tables as $row_id) {
         foreach ($row_id as $cell_id => $cells) {
           if (!array_key_exists($cell_id, $this->inactiveCells)) {
-            $active_val['tableCount-' . $t][] = $cells;
+            $active_val["tableCount-{$t}"][] = $cells;
           }
         }
       }
@@ -200,8 +200,8 @@ class TableForm extends FormBase {
       // Validation different tables.
       foreach ($values as $id => $value) {
         for ($f = 0; $f < count($values); $f++) {
-          if (empty($active_val['tableCount-1'][$f]) !== empty($active_val['tableCount-' . $t][$f])) {
-            $form_state->setErrorByName('tableCount-' . $t, 'Tables are different.');
+          if (empty($active_val['tableCount-1'][$f]) !== empty($active_val["tableCount-{$t}"][$f])) {
+            $form_state->setErrorByName("tableCount-{$t}", 'Tables are different.');
           }
         }
         // Validation of start point.
@@ -238,7 +238,7 @@ class TableForm extends FormBase {
     for ($t = 0; $t <= $this->tableCount; $t++) {
       for ($r = 1; $r <= $this->rowCount; $r++) {
         // Value setting.
-        $value = $form_state->getValue(['tableCount-' . $t, $r]);
+        $value = $form_state->getValue(["tableCount-{$t}", $r]);
         // Default value for inactive cells.
         $q1 = 0;
         $q2 = 0;
@@ -262,11 +262,11 @@ class TableForm extends FormBase {
           $ytd = round((($q1 + $q2 + $q3 + $q4) + 1) / 4, 2);
         }
         // Set values for inactive cells.
-        $form['tableCount-' . $t][$r]['q1']['#value'] = $q1;
-        $form['tableCount-' . $t][$r]['q2']['#value'] = $q2;
-        $form['tableCount-' . $t][$r]['q3']['#value'] = $q3;
-        $form['tableCount-' . $t][$r]['q4']['#value'] = $q4;
-        $form['tableCount-' . $t][$r]['ytd']['#value'] = $ytd;
+        $form["tableCount-{$t}"][$r]['q1']['#value'] = $q1;
+        $form["tableCount-{$t}"][$r]['q2']['#value'] = $q2;
+        $form["tableCount-{$t}"][$r]['q3']['#value'] = $q3;
+        $form["tableCount-{$t}"][$r]['q4']['#value'] = $q4;
+        $form["tableCount-{$t}"][$r]['ytd']['#value'] = $ytd;
       }
     }
     $this->messenger()->addStatus('Valid.');
